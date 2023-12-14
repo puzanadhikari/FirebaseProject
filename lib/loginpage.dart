@@ -94,6 +94,9 @@ class _LoginPageState extends State<LoginPage> {
                   ElevatedButton(
                     onPressed: () {
                      _auth.signInWithEmailAndPassword(context,emailController.text,passwordController.text);
+                     Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage()));
+                     emailController.clear();
+                     passwordController.clear();
                     },
                     child: Text('Login', style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(primary: Colors.green),
@@ -130,60 +133,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-  // Future<void> login() async {
-  //
-  //
-  //   // Replace the URL with your actual signup API endpoint
-  //   final String apiUrl = 'https://emloyeedetails-default-rtdb.firebaseio.com/login.json';
-  //
-  //   try {
-  //     final response = await http.post(
-  //       Uri.parse(apiUrl),
-  //       body: jsonEncode(
-  //           {
-  //             'username': emailController.text.toString(),
-  //             'password': passwordController.text.toString()
-  //           }
-  //       ),
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       Fluttertoast.showToast(
-  //           msg: 'Login successfully',
-  //           backgroundColor: Colors.green,
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           gravity: ToastGravity.TOP_RIGHT,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //       // Successful signup
-  //       print('login successful');
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => HomePage()),
-  //       );
-  //     } else {
-  //       // Handle errors, e.g., display an error message
-  //       print('login failed. Status code: ${response.statusCode}');
-  //       print('Response body: ${response.body}');
-  //     }
-  //   } catch (e) {
-  //     // Handle network or other errors
-  //     print('Error during signup: $e');
-  //   }
-  // }
-  void _Login() async{
-
-    String email= emailController.text;
-    String password= passwordController.text;
-
-    // User? user =await _auth.signInWithEmailAndPassword(email, password);
-    if(email!=null){
-      print("User is successfully Signed In.");
-      // Navigator
-    }else{
-      print("Some error happened");
-    }
-
   }
 }
