@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'employee_edit.dart';
 import 'employee_model.dart';
+
 class EmployeeListPage extends StatefulWidget {
   @override
   _EmployeeListPageState createState() => _EmployeeListPageState();
@@ -12,6 +14,7 @@ class EmployeeListPage extends StatefulWidget {
 
 class _EmployeeListPageState extends State<EmployeeListPage> {
   List<Employee> employees = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -20,10 +23,12 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
   }
 
   void fetchData() async {
+    await Future.delayed(Duration(seconds: 2));
     List<Employee> fetchedEmployees = await fetchDataFromFirebase();
     setState(() {
       employees = fetchedEmployees;
       log(employees.toString());
+      isLoading = false;
     });
   }
 
@@ -34,7 +39,7 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
         title: Text('Employee List'),
         backgroundColor: Colors.green,
       ),
-      body: ListView.builder(
+      body: isLoading ? _buildShimmerEffect( employees.length > 0 ? employees.length : 1) : ListView.builder(
         itemCount: employees.length,
         itemBuilder: (context, index) {
           Employee employee = employees[index];
@@ -79,6 +84,56 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
       ),
     );
   }
+
+  Widget _buildShimmerEffect(int itemCount) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: ListView.builder(
+        itemCount: itemCount,
+        itemBuilder: (context, index) {
+          return Card(
+            elevation: 4,
+            margin: EdgeInsets.all(8),
+            child: ListTile(
+              title: Container(
+                height: 16,
+                width: double.infinity,
+                color: Colors.white,
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 12,
+                    width: double.infinity,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 8),
+                  Container(
+                    width: 24,
+                    height: 24,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Future<List<Employee>> fetchDataFromFirebase() async {
     List<Employee> employeeList = [];
     try {
@@ -90,13 +145,13 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         data.forEach((key, value) {
-          employeeList.add(Employee.fromJson(key,value));
+          employeeList.add(Employee.fromJson(key, value));
           // log(employeeList.toString());
           log(jsonDecode(response.body).toString());
-
         });
       } else {
-        print("Failed to fetch data from Firebase. Status code: ${response.statusCode}");
+        print("Failed to fetch data from Firebase. Status code: ${response
+            .statusCode}");
       }
     } catch (error) {
       print("Error fetching data from Firebase: $error");
@@ -136,7 +191,8 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
   void _performDelete(Employee employee) async {
     try {
       String firebaseUrl =
-          "https://emloyeedetails-default-rtdb.firebaseio.com/employee/${employee.id}.json";
+          "https://emloyeedetails-default-rtdb.firebaseio.com/employee/${employee
+          .id}.json";
       // const dataRef = database.ref(dataPath);
 
       final response = await http.delete(Uri.parse(firebaseUrl));
@@ -162,14 +218,16 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
       print("Error deleting employee: $error");
     }
   }
+
   void _editEmployee(Employee employee) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EmployeeEditPage(
-          employee: employee,
-          onUpdate: _updateEmployee,
-        ),
+        builder: (context) =>
+            EmployeeEditPage(
+              employee: employee,
+              onUpdate: _updateEmployee,
+            ),
       ),
     );
   }

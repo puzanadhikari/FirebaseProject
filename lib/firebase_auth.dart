@@ -32,7 +32,7 @@ class FirebaseAuthService {
       return userCredential.user;
     } catch (e) {
       // If there's an error during registration, handle it here.
-      print("Error during registration: $e");
+      log("Error during registration: $e");
       Fluttertoast.showToast(
           msg: 'Signup Failed',
           backgroundColor: Colors.green,
@@ -62,7 +62,7 @@ class FirebaseAuthService {
       Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage()));
       return credential.user;
     } catch (e) {
-      print("Some error occured");
+      log("Some error occured");
       Fluttertoast.showToast(
           msg: 'Login Failed',
           backgroundColor: Colors.green,

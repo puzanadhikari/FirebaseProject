@@ -28,6 +28,9 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  shimmer: ^3.0.0
+  permission_handler: ^11.1.0
+  contacts_service: ^0.6.3
   google_maps_flutter: ^2.5.0
   location:
   http:

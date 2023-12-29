@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:contacts_service/contacts_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/http.dart" as http;
 import 'package:flutter/foundation.dart';
@@ -11,8 +12,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
+import 'drawer_page.dart';
 import 'employee_list.dart';
 import 'map_screen.dart';
 
@@ -291,6 +294,12 @@ class _HomePageState extends State<HomePage> {
                         Icons.phone_rounded,
                         color: Colors.black,
                       ),
+                      suffixIcon: GestureDetector(
+                        onTap: ()async {
+                          await _pickContact();
+                        },
+                        child: Icon(Icons.contacts_rounded),
+                      )
                     ),
                   ),
                 ),
@@ -493,6 +502,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+      drawer: DrawerPage(),
     );
   }
 
@@ -580,5 +590,25 @@ class _HomePageState extends State<HomePage> {
         builder: (context) => MapScreen(),
       ),
     );
+  }
+  Future<void> _pickContact() async {
+    PermissionStatus permissionStatus = await Permission.contacts.request();
+
+    if (permissionStatus == PermissionStatus.granted) {
+      // Pick a contact
+      Contact? contact = await ContactsService.openDeviceContactPicker();
+
+      if (contact != null) {
+        // Update the contactController with the selected contact's number
+        setState(() {
+          contactController.text = contact.phones?.isNotEmpty == true
+              ? contact.phones!.first.value ?? ""
+              : "";
+        });
+      }
+    } else {
+      // Handle denied or restricted permission
+      // You may want to show a message or request the permission again
+    }
   }
 }

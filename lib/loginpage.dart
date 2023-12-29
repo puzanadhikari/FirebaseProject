@@ -7,25 +7,23 @@ import 'package:newapp/signupPage.dart';
 
 import 'firebase_auth.dart';
 
-// import 'firebase_auth.dart';
-
 class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final FirebaseAuthService _auth=FirebaseAuthService();
+  final FirebaseAuthService _auth = FirebaseAuthService();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
+  bool obscurePassword = true;
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,35 +66,46 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextField(
                       controller: emailController,
                       decoration: InputDecoration(
-                        hintText: 'Email',
-                        border: InputBorder.none,
-                        prefixIcon: Icon(Icons.email_outlined)
-                      ),
+                          hintText: 'Email',
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.email_outlined)),
                     ),
                   ),
-                  SizedBox(height: 16.0),Container(
+                  SizedBox(height: 16.0),
+                  Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
                       color: Colors.grey[200],
                     ),
                     child: TextField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: obscurePassword,
                       decoration: InputDecoration(
                         hintText: 'Password',
                         border: InputBorder.none,
-                        prefixIcon: Icon(Icons.lock)
+                        prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),
-
                   SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: () {
-                     _auth.signInWithEmailAndPassword(context,emailController.text,passwordController.text);
-                     Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage()));
-                     emailController.clear();
-                     passwordController.clear();
+                      _auth.signInWithEmailAndPassword(
+                          context,
+                          emailController.text,
+                          passwordController.text);
+                      emailController.clear();
+                      passwordController.clear();
                     },
                     child: Text('Login', style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(primary: Colors.green),
@@ -110,10 +119,11 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Colors.black, fontSize: 15),
                       ),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => SignUpLogin()),
+                            MaterialPageRoute(
+                                builder: (context) => SignUpLogin()),
                           );
                         },
                         child: Text(
